@@ -15,7 +15,9 @@ router.get('/personas', async (req, res) => {
 
 router.get('/talleres', async (req, res) => {
 	try{
-    		const data = await pool.query('Select codigo_actividad, nombre_actividad, modalidad, area, fecha_inicio FROM all_talleres');
+    	const data = await pool.query('Select codigo_actividad, nombre_actividad, modalidad, area, fecha_inicio FROM all_talleres');
+    	const data2 = await pool.query('Select codigo_actividad, direccion_archivo from direccion_multimedia');
+    	
 		for(var z in data){
 			var fecha_ini = data[z].fecha_inicio.toISOString().substring(0, 10);
 			//var fecha_ter = data[z].fecha_termino.toISOString().substring(0, 10);
@@ -23,6 +25,20 @@ router.get('/talleres', async (req, res) => {
 				data[z]['fecha_inicio'] = fecha_ini;
 				//data[z]['fecha_termino'] = fecha_ter;
 			}
+			arrayMultimedia = [];
+			for(var h in data2){
+				if(data[z]['codigo_actividad']==data2[h]['codigo_actividad']){
+					arrayMultimedia.push(data2[h].direccion_archivo);
+					data[z]['fotos'] = arrayMultimedia;
+
+				}
+
+			}
+
+			if(arrayMultimedia==''){
+						data[z]['fotos']= 'SIN FOTOS';
+			}
+			
 			
 		}
 		
@@ -65,3 +81,4 @@ router.get('/detalles/:cod', async (req, res) => {
 
 
 module.exports = router;
+

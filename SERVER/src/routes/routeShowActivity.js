@@ -52,7 +52,7 @@ router.get('/talleres', async (req, res) => {
 router.get('/detalles/:cod', async (req, res) => {
 	try{
 		const {cod} = req.params;
-    		const data = await pool.query('select actividades.codigo_actividad, actividades.rut_responsable, actividades.cupos, actividades.direccion, actividades.nombre_actividad, actividades.estado_actividad, actividades.descripción, actividades.fecha_inicio, actividades.fecha_termino, actividades.modalidad, actividades.requisitos, actividades.area, persona.nombres, persona.apellidos, persona.numero_contacto from actividades join persona on  actividades.codigo_actividad = ? and actividades.rut_responsable=persona.rut',[cod]);
+    		const data = await pool.query('select a.codigo_actividad, a.rut_responsable, a.cupos, a.direccion, a.nombre_actividad, a.estado_actividad, a.descripción, a.fecha_inicio, a.fecha_termino, a.modalidad, a.requisitos, a.area, p.nombres, p.apellidos, p.numero_contacto from actividades as a join persona as p on  a.codigo_actividad = ? and a.rut_responsable=p.rut',[cod]);
     		const data2 = await pool.query('select correo.correo from correo join actividades on correo.rut=actividades.rut_responsable and actividades.codigo_actividad=?', [cod]);
 		for(var z in data){
 			var fecha_ini = data[z].fecha_inicio.toISOString().substring(0, 10);

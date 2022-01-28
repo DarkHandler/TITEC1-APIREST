@@ -11,6 +11,8 @@ app.use(morgan('dev')); //para mostrar un determinado tipo de mensaje en consola
 
 // Rutas (URL)
 app.use('/api',require('./routes/routeShowActivity.js'));
+app.use('/api/images',require('./routes/routeImages.js'));
+
 
 // Iniciando Servidor
 app.listen(app.get('port'), () => {

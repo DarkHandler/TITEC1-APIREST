@@ -175,7 +175,7 @@ DROP TABLE IF EXISTS `direccion`;
 CREATE TABLE `direccion` (
   `rut` varchar(13) NOT NULL,
   `localidad` varchar(50) NOT NULL,
-  `numero` varchar(4) NOT NULL,
+  `numero` int NOT NULL,
   `poblacion_o_villa` varchar(100) NOT NULL,
   `calle` varchar(100) NOT NULL,
   KEY `rut` (`rut`),
@@ -683,4 +683,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-01-28  0:18:37
+-- Dump completed on 2022-02-02 18:06:33

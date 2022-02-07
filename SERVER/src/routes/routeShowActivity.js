@@ -57,6 +57,9 @@ router.get('/detalles/:cod', async (req, res) => {
 		const data = await pool.query('select a.codigo_actividad, a.rut_responsable, a.cupos, a.direccion, a.nombre_actividad, a.estado_actividad, a.descripción, a.fecha_inicio, a.fecha_termino, a.modalidad, a.requisitos, a.area, p.nombres, p.apellidos, p.numero_contacto from actividades as a join persona as p on  a.codigo_actividad = ? and a.rut_responsable=p.rut', [cod]);
 		const data2 = await pool.query('select correo.correo from correo join actividades on correo.rut=actividades.rut_responsable and actividades.codigo_actividad=?', [cod]);
 		const data3 = await pool.query('Select codigo_actividad, direccion_archivo from direccion_multimedia where codigo_actividad=?', [cod]);
+		const data4 = await pool.query('select count(*) as personas_aceptadas from solicitud_deportiva where estado="aceptada" and codigo_actividad=?',[cod]);
+		const data5 = await pool.query('select horario from horarios where codigo_actividad=?',[cod]);
+
 		for (var z in data) {
 			var fecha_ini = data[z].fecha_inicio.toISOString().substring(0, 10);
 			var fecha_ter = data[z].fecha_termino.toISOString().substring(0, 10);
@@ -64,8 +67,8 @@ router.get('/detalles/:cod', async (req, res) => {
 				data[z]['fecha_inicio'] = fecha_ini;
 				data[z]['fecha_termino'] = fecha_ter;
 			}
-
 		}
+
 		var arrayCorreos = [];
 		for (var x in data2) {
 			arrayCorreos.push(data2[x].correo);
@@ -75,6 +78,21 @@ router.get('/detalles/:cod', async (req, res) => {
 		for (var x in data3) {
 			arrayMultimedia.push(data3[x].direccion_archivo);
 		}
+
+		var personas_aceptadas = 0;
+		for(var x in data4){
+			personas_aceptadas = data4[x].personas_aceptadas;
+		}
+		
+		var arrayHorarios = [];
+		for(var x in data5){
+			arrayHorarios.push(data5[x].horario);
+		}
+
+		if(arrayHorarios == ''){
+			arrayHorarios.push("DE MOMENTO, NO HAY HORARIOS DISPONIBLES");
+		}
+
 		if (arrayMultimedia == '') {
 			arrayMultimedia.push("SIN FOTOS");
 		}
@@ -82,6 +100,8 @@ router.get('/detalles/:cod', async (req, res) => {
 		data.map(function (row) {
 			row['correos'] = arrayCorreos;
 			row['fotos'] = arrayMultimedia;
+			row['personas_aceptadas'] = personas_aceptadas;
+			row['horarios'] = arrayHorarios;			
 		});
 		res.send(data);
 

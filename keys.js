@@ -4,7 +4,7 @@ module.exports = {
     database:{
         host:'localhost',
         user:'root',
-        password:'titec1-LECOFQ',
+        password:'',
         database:'titec2bd'
     }
 }

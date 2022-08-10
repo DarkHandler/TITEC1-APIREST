@@ -16,6 +16,65 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+
+DELIMITER $$
+
+--
+-- Funciones
+--
+CREATE DEFINER=`root`@`localhost` FUNCTION `validate_rut` (`RUT` VARCHAR(12)) RETURNS INT(11) 
+READS SQL DATA
+DETERMINISTIC
+BEGIN
+DECLARE strlen INT;
+DECLARE i INT;
+DECLARE j INT;
+DECLARE suma NUMERIC;
+DECLARE temprut VARCHAR(12);
+DECLARE verify_dv CHAR(2);
+DECLARE DV CHAR(1);
+SET RUT = REPLACE(REPLACE(RUT, '.', ''),'-','');
+SET DV = SUBSTR(RUT,-1,1);
+SET RUT = SUBSTR(RUT,1,LENGTH(RUT)-1);
+SET i = 1;
+  SET strlen = LENGTH(RUT);
+  SET j = 2;
+  SET suma = 0;
+IF strlen = 8 OR strlen = 7 THEN
+SET temprut = REVERSE(RUT);
+moduloonce: LOOP
+    IF i <= LENGTH(temprut) THEN
+    SET suma = suma + (CONVERT(SUBSTRING(temprut, i, 1),UNSIGNED INTEGER) * j); 
+      SET i = i + 1;
+      IF j = 7 THEN
+    SET j = 2;
+    ELSE
+    SET j = j + 1;
+    END IF;
+      ITERATE moduloonce;
+    END IF;
+    LEAVE moduloonce;
+  END LOOP moduloonce;
+  SET verify_dv = 11 - (suma % 11);
+  IF verify_dv = 11 THEN
+  SET verify_dv = 0;
+  ELSEIF verify_dv = 10 THEN 
+  SET verify_dv = 'K';
+  END IF;
+  IF DV = verify_dv THEN
+  RETURN 1;
+  ELSE 
+  RETURN 0;
+  END IF;
+END IF;
+RETURN 0;
+END$$
+
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `actividades`
 --
 
@@ -39,7 +98,7 @@ CREATE TABLE `actividades` (
   PRIMARY KEY (`codigo_actividad`,`rut_responsable`),
   KEY `rut_responsable` (`rut_responsable`),
   CONSTRAINT `actividades_ibfk_1` FOREIGN KEY (`rut_responsable`) REFERENCES `persona` (`rut`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -87,7 +146,7 @@ CREATE TABLE `area` (
   `id_area` int NOT NULL AUTO_INCREMENT,
   `area` varchar(45) NOT NULL,
   PRIMARY KEY (`id_area`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -113,7 +172,7 @@ CREATE TABLE `comprobante_de_hora` (
   PRIMARY KEY (`id_comprobante`),
   KEY `id_hora` (`id_hora`),
   CONSTRAINT `comprobante_de_hora_ibfk_1` FOREIGN KEY (`id_hora`) REFERENCES `hora_medica` (`id_hora`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -137,7 +196,7 @@ CREATE TABLE `correo` (
   `correo` varchar(100) NOT NULL,
   PRIMARY KEY (`rut`,`correo`),
   CONSTRAINT `correo_ibfk_1` FOREIGN KEY (`rut`) REFERENCES `persona` (`rut`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -180,7 +239,7 @@ CREATE TABLE `direccion` (
   `calle` varchar(100) NOT NULL,
   KEY `rut` (`rut`),
   CONSTRAINT `direccion_ibfk_1` FOREIGN KEY (`rut`) REFERENCES `persona` (`rut`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -204,7 +263,7 @@ CREATE TABLE `direccion_multimedia` (
   `direccion_archivo` mediumtext,
   KEY `codigo_actividad` (`codigo_actividad`),
   CONSTRAINT `direccion_multimedia_ibfk_1` FOREIGN KEY (`codigo_actividad`) REFERENCES `actividades` (`codigo_actividad`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -231,7 +290,7 @@ CREATE TABLE `especialidad` (
   PRIMARY KEY (`id_especialidad`),
   KEY `id_area` (`id_area`),
   CONSTRAINT `especialidad_ibfk_1` FOREIGN KEY (`id_area`) REFERENCES `area` (`id_area`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -254,7 +313,7 @@ CREATE TABLE `estado` (
   `codigo_estado` int NOT NULL,
   `glosa` varchar(20) NOT NULL,
   PRIMARY KEY (`codigo_estado`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -280,7 +339,7 @@ CREATE TABLE `ficha_clinica` (
   PRIMARY KEY (`fecha`),
   KEY `rut` (`rut`),
   CONSTRAINT `ficha_clinica_ibfk_1` FOREIGN KEY (`rut`) REFERENCES `persona` (`rut`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -326,7 +385,7 @@ CREATE TABLE `ficha_nutricional` (
   PRIMARY KEY (`fecha`),
   KEY `rut` (`rut`),
   CONSTRAINT `ficha_nutricional_ibfk_1` FOREIGN KEY (`rut`) REFERENCES `persona` (`rut`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -352,7 +411,7 @@ CREATE TABLE `ficha_psicologica` (
   PRIMARY KEY (`fecha`),
   KEY `rut` (`rut`),
   CONSTRAINT `ficha_psicologica_ibfk_1` FOREIGN KEY (`rut`) REFERENCES `persona` (`rut`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -379,7 +438,7 @@ CREATE TABLE `hora_medica` (
   PRIMARY KEY (`id_hora`),
   KEY `rut_p` (`rut_p`),
   CONSTRAINT `hora_medica_ibfk_1` FOREIGN KEY (`rut_p`) REFERENCES `profesional` (`rut_p`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -403,7 +462,7 @@ CREATE TABLE `horarios` (
   `horario` varchar(100) NOT NULL,
   PRIMARY KEY (`codigo_actividad`,`horario`),
   CONSTRAINT `horarios_ibfk_1` FOREIGN KEY (`codigo_actividad`) REFERENCES `actividades` (`codigo_actividad`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -432,7 +491,7 @@ CREATE TABLE `persona` (
   `prevision` varchar(20) DEFAULT 'Sin Previsión',
   `foto` tinytext,
   PRIMARY KEY (`rut`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -444,6 +503,8 @@ LOCK TABLES `persona` WRITE;
 INSERT INTO `persona` VALUES ('13.231.412-2','Eugenio Alonso','Vivar Cortes','+569312412','1999-01-01','FONASA',NULL),('14.222.313-3','Sebastian Rodrigo','Yañez Medina','+5691112233','1999-02-03','ISAPRE',NULL),('17.333.222-2','Mauricio Gonzalo','Olivares Soto','+5694242312','1972-03-07','ISAPRE',NULL);
 /*!40000 ALTER TABLE `persona` ENABLE KEYS */;
 UNLOCK TABLES;
+
+
 
 --
 -- Table structure for table `pro_espec`
@@ -459,7 +520,7 @@ CREATE TABLE `pro_espec` (
   KEY `id_especialidad` (`id_especialidad`),
   CONSTRAINT `pro_espec_ibfk_1` FOREIGN KEY (`rut_p`) REFERENCES `profesional` (`rut_p`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `pro_espec_ibfk_2` FOREIGN KEY (`id_especialidad`) REFERENCES `especialidad` (`id_especialidad`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -487,7 +548,7 @@ CREATE TABLE `profesional` (
   PRIMARY KEY (`rut_p`),
   KEY `num_sala` (`num_sala`),
   CONSTRAINT `profesional_ibfk_1` FOREIGN KEY (`num_sala`) REFERENCES `sala` (`num_sala`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -510,7 +571,7 @@ CREATE TABLE `sala` (
   `num_sala` int NOT NULL,
   `ubicacion` varchar(45) NOT NULL,
   PRIMARY KEY (`num_sala`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -538,7 +599,7 @@ CREATE TABLE `solicita` (
   KEY `id_hora` (`id_hora`),
   CONSTRAINT `solicita_ibfk_1` FOREIGN KEY (`rut`) REFERENCES `persona` (`rut`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `solicita_ibfk_2` FOREIGN KEY (`id_hora`) REFERENCES `hora_medica` (`id_hora`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -570,7 +631,7 @@ CREATE TABLE `solicitud_deportiva` (
   KEY `codigo_actividad` (`codigo_actividad`),
   CONSTRAINT `solicitud_deportiva_ibfk_1` FOREIGN KEY (`rut_postulante`) REFERENCES `persona` (`rut`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `solicitud_deportiva_ibfk_2` FOREIGN KEY (`codigo_actividad`) REFERENCES `actividades` (`codigo_actividad`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -593,7 +654,7 @@ CREATE TABLE `tipo_de_usuario` (
   `codigo_tip_usa` int NOT NULL,
   `glosa` varchar(20) NOT NULL,
   PRIMARY KEY (`codigo_tip_usa`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -626,7 +687,7 @@ CREATE TABLE `usuario` (
   CONSTRAINT `usuario_ibfk_1` FOREIGN KEY (`rut`) REFERENCES `persona` (`rut`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `usuario_ibfk_2` FOREIGN KEY (`codigo_tip_usa`) REFERENCES `tipo_de_usuario` (`codigo_tip_usa`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `usuario_ibfk_3` FOREIGN KEY (`codigo_estado`) REFERENCES `estado` (`codigo_estado`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -648,7 +709,7 @@ UNLOCK TABLES;
 /*!50001 SET @saved_col_connection     = @@collation_connection */;
 /*!50001 SET character_set_client      = utf8mb4 */;
 /*!50001 SET character_set_results     = utf8mb4 */;
-/*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
+/*!50001 SET collation_connection      = utf8mb4_general_ci */;
 /*!50001 CREATE ALGORITHM=UNDEFINED */
 /*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
 /*!50001 VIEW `all_talleres` AS select `actividades`.`codigo_actividad` AS `codigo_actividad`,`actividades`.`rut_responsable` AS `rut_responsable`,`actividades`.`tipo` AS `tipo`,`actividades`.`cupos` AS `cupos`,`actividades`.`direccion` AS `direccion`,`actividades`.`nombre_actividad` AS `nombre_actividad`,`actividades`.`estado_actividad` AS `estado_actividad`,`actividades`.`descripción` AS `descripción`,`actividades`.`fecha_inicio` AS `fecha_inicio`,`actividades`.`fecha_termino` AS `fecha_termino`,`actividades`.`modalidad` AS `modalidad`,`actividades`.`requisitos` AS `requisitos`,`actividades`.`area` AS `area` from `actividades` where (`actividades`.`tipo` = 'Taller') */;
@@ -666,7 +727,7 @@ UNLOCK TABLES;
 /*!50001 SET @saved_col_connection     = @@collation_connection */;
 /*!50001 SET character_set_client      = utf8mb4 */;
 /*!50001 SET character_set_results     = utf8mb4 */;
-/*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
+/*!50001 SET collation_connection      = utf8mb4_general_ci */;
 /*!50001 CREATE ALGORITHM=UNDEFINED */
 /*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
 /*!50001 VIEW `datos_profesor` AS select `persona`.`rut` AS `rut`,`persona`.`nombres` AS `nombres`,`persona`.`apellidos` AS `apellidos`,`persona`.`numero_contacto` AS `numero_contacto` from `persona` */;

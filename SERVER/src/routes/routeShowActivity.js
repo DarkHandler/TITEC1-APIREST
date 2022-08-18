@@ -146,12 +146,6 @@ router.post('/postulacion', async (req, res) => {
 		}else{
 			await pool.query('insert into persona(rut, nombres, apellidos, numero_contacto, fecha_nacimiento, prevision) values(?,?,?,?,?,?) ',[datos.rut, datos.nombres, datos.apellidos, datos.numero_contacto_final, datos.fecha_nac, datos.previsionChecked]);
 		}
-		
-		// if(rut_duplicado == undefined){
-		// 	await pool.query('insert into persona(rut, nombres, apellidos, numero_contacto, fecha_nacimiento, prevision) values(?,?,?,?,?,?) ',[datos.rut, datos.nombres, datos.apellidos, datos.numero_contacto_final, datos.fecha_nac, datos.previsionChecked]);
-		// }else{
-		// 	res.send(false);
-		// }
 	
 	} catch (err) {
 		return res.status(505).send({errmsj:err.sqlMessage, errno: err.errno});
@@ -168,23 +162,22 @@ router.post('/postulacion', async (req, res) => {
 		return res.status(505).send({errmsj:err.sqlMessage, errno: err.errno});
 	}
 
-	// try {
-	// 	await pool.query('insert into direccion(rut, localidad, numero, poblacion_o_villa, calle) values(?,?,?,?,?)',[datos.rut, datos.distritoChecked, parseInt(datos.numeroNuevoDepaCasa), datos.poblacion, datos.calle]);
-	// } catch (error) {
-	// 	console.log("error en insert direccion");
-	// 	console.log(error);
-	// 	resultado = {res:"en insert direccion"};
-	// }
+	try {
+		await pool.query('insert into direccion(rut, localidad, numero, poblacion_o_villa, calle) values(?,?,?,?,?)',[datos.rut, datos.distritoChecked, parseInt(datos.numeroNuevoDepaCasa), datos.poblacion, datos.calle]);
+	} catch (error) {
+		console.log("error en insert direccion");
+		console.log(error);
+		resultado = {res:"en insert direccion"};
+	}
 
-	// try {
-	// 	await pool.query('insert into solicitud_deportiva(rut_postulante, codigo_actividad, fecha_inscripcion) values(?,?,?)',[datos.rut, datos.codigo_actividad, fecha_inscripcion]);
-	// } catch (error) {
-	// 	console.log("error en insert solcicitud_deportiva");
-	// 	console.log(error);
-	// 	resultado = {res:"en insert solcicitud_deportiva"};
-	// }
+	try {
+		await pool.query('insert into solicitud_deportiva(rut_postulante, codigo_actividad, fecha_inscripcion) values(?,?,?)',[datos.rut, datos.codigo_actividad, fecha_inscripcion]);
+	} catch (error) {
+		console.log("error en insert solcicitud_deportiva");
+		console.log(error);
+		resultado = {res:"en insert solcicitud_deportiva"};
+	}
 	
-
 	res.send(resultado);
 });
 

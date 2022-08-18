@@ -127,38 +127,62 @@ router.post('/postulacion', async (req, res) => {
 
 	
 	try {
-		await pool.query('insert into persona(rut, nombres, apellidos, numero_contacto, fecha_nacimiento, prevision) values(?,?,?,?,?,?) ',[datos.rut, datos.nombres, datos.apellidos, datos.numero_contacto_final, datos.fecha_nac, datos.previsionChecked]);
-	} catch (error) {
-		console.log("error en insert persona");
-		console.log(error);	
-		resultado = {res:"en insert persona"};
+		var rut_existente = await pool.query('select rut_postulante from solicitud_deportiva where rut_postulante=? AND codigo_actividad=?', [datos.rut, datos.codigo_actividad]);
+		if(rut_existente.length > 0){
+			resultado = {res:"rut postulado"};
+			return res.send(resultado);
+		}
+		var insert_persona = {};
+		insert_persona.rut = datos.rut;
+		insert_persona.nombres = datos.nombres;
+		insert_persona.apellidos = datos.apellidos;
+		insert_persona.numero_contacto = datos.numero_contacto_final;
+		insert_persona.fecha_nacimiento = datos.fecha_nac;
+		insert_persona.prevision = datos.previsionChecked;
+
+		var rut_duplicado = await pool.query('select rut from persona where rut=?', datos.rut);
+		if(rut_duplicado.length > 0){
+			await pool.query('update persona set ? where rut = ?', [insert_persona, datos.rut]);
+		}else{
+			await pool.query('insert into persona(rut, nombres, apellidos, numero_contacto, fecha_nacimiento, prevision) values(?,?,?,?,?,?) ',[datos.rut, datos.nombres, datos.apellidos, datos.numero_contacto_final, datos.fecha_nac, datos.previsionChecked]);
+		}
+		
+		// if(rut_duplicado == undefined){
+		// 	await pool.query('insert into persona(rut, nombres, apellidos, numero_contacto, fecha_nacimiento, prevision) values(?,?,?,?,?,?) ',[datos.rut, datos.nombres, datos.apellidos, datos.numero_contacto_final, datos.fecha_nac, datos.previsionChecked]);
+		// }else{
+		// 	res.send(false);
+		// }
+	
+	} catch (err) {
+		return res.status(505).send({errmsj:err.sqlMessage, errno: err.errno});
 	}
 	
 	try {
 		datos.arrayCorreos.map( async (correo) => {
-			await pool.query('insert into correo(rut, correo) values(?,?)',[datos.rut, correo]);
-		});
-	} catch (error) {
-		console.log("error en insert correo");
-		console.log(error);
-		resultado = {res:"en insert correo"};
+			var correo_duplicado = await pool.query('select correo from correo where rut=? and correo=?', [datos.rut, correo]);
+			if(correo_duplicado.length == 0){
+				await pool.query('insert into correo(rut, correo) values(?,?)',[datos.rut, correo]);
+			}
+	 	});
+	 } catch (error) {
+		return res.status(505).send({errmsj:err.sqlMessage, errno: err.errno});
 	}
 
-	try {
-		await pool.query('insert into direccion(rut, localidad, numero, poblacion_o_villa, calle) values(?,?,?,?,?)',[datos.rut, datos.distritoChecked, parseInt(datos.numeroNuevoDepaCasa), datos.poblacion, datos.calle]);
-	} catch (error) {
-		console.log("error en insert direccion");
-		console.log(error);
-		resultado = {res:"en insert direccion"};
-	}
+	// try {
+	// 	await pool.query('insert into direccion(rut, localidad, numero, poblacion_o_villa, calle) values(?,?,?,?,?)',[datos.rut, datos.distritoChecked, parseInt(datos.numeroNuevoDepaCasa), datos.poblacion, datos.calle]);
+	// } catch (error) {
+	// 	console.log("error en insert direccion");
+	// 	console.log(error);
+	// 	resultado = {res:"en insert direccion"};
+	// }
 
-	try {
-		await pool.query('insert into solicitud_deportiva(rut_postulante, codigo_actividad, fecha_inscripcion) values(?,?,?)',[datos.rut, datos.codigo_actividad, fecha_inscripcion]);
-	} catch (error) {
-		console.log("error en insert solcicitud_deportiva");
-		console.log(error);
-		resultado = {res:"en insert solcicitud_deportiva"};
-	}
+	// try {
+	// 	await pool.query('insert into solicitud_deportiva(rut_postulante, codigo_actividad, fecha_inscripcion) values(?,?,?)',[datos.rut, datos.codigo_actividad, fecha_inscripcion]);
+	// } catch (error) {
+	// 	console.log("error en insert solcicitud_deportiva");
+	// 	console.log(error);
+	// 	resultado = {res:"en insert solcicitud_deportiva"};
+	// }
 	
 
 	res.send(resultado);

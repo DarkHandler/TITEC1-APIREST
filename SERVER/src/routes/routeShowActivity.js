@@ -177,7 +177,9 @@ router.post('/postulacion', async (req, res) => {
 		console.log(error);
 		resultado = {res:"en insert solcicitud_deportiva"};
 	}
-	
+	if(resultado!=0){
+		resultado = {res: "concretado"};
+	}
 	res.send(resultado);
 });
 

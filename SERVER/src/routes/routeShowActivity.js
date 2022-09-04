@@ -150,14 +150,17 @@ router.post('/postulacion', async (req, res) => {
 	} catch (err) {
 		return res.status(505).send({errmsj:err.sqlMessage, errno: err.errno});
 	}
+	//aqui ingresamos correos
 	
 	try {
+		if(datos.arrayCorreos.length>0){
 		datos.arrayCorreos.map( async (correo) => {
 			var correo_duplicado = await pool.query('select correo from correo where rut=? and correo=?', [datos.rut, correo]);
 			if(correo_duplicado.length == 0){
 				await pool.query('insert into correo(rut, correo) values(?,?)',[datos.rut, correo]);
 			}
 	 	});
+		}
 	 } catch (error) {
 		return res.status(505).send({errmsj:err.sqlMessage, errno: err.errno});
 	}

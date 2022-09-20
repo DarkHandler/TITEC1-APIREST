@@ -166,7 +166,10 @@ router.post('/postulacion', async (req, res) => {
 	}
 
 	try {
-		await pool.query('insert into direccion(rut, localidad, numero, poblacion_o_villa, calle) values(?,?,?,?,?)',[datos.rut, datos.distritoChecked, parseInt(datos.numeroNuevoDepaCasa), datos.poblacion, datos.calle]);
+		var direccion_duplicada = await pool.query('select * from direccion where rut = ?', [datos.rut]);
+		if(direccion_duplicada.length == 0){
+			await pool.query('insert into direccion(rut, localidad, numero, poblacion_o_villa, calle) values(?,?,?,?,?)',[datos.rut, datos.distritoChecked, parseInt(datos.numeroNuevoDepaCasa), datos.poblacion, datos.calle]);
+		}
 	} catch (error) {
 		console.log("error en insert direccion");
 		console.log(error);

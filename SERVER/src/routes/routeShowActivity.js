@@ -16,8 +16,8 @@ router.get('/personas', async (req, res) => {
 
 router.get('/talleres', async (req, res) => {
 	try {
-		const data = await pool.query('Select codigo_actividad, nombre_actividad, modalidad, area, fecha_inicio FROM all_talleres');
-		const data2 = await pool.query('Select codigo_actividad, direccion_archivo from direccion_multimedia');
+		const data = await pool.query('Select codigo_Taller, nombre_taller, modalidad, area, fecha_inicio FROM taller');
+		const data2 = await pool.query('Select codigo_Taller, direccion_archivo_taller from direccion_multimedia_taller');
 
 		for (var z in data) {
 			var fecha_ini = data[z].fecha_inicio.toISOString().substring(0, 10);
@@ -28,8 +28,8 @@ router.get('/talleres', async (req, res) => {
 			}
 			arrayMultimedia = [];
 			for (var h in data2) {
-				if (data[z]['codigo_actividad'] == data2[h]['codigo_actividad']) {
-					arrayMultimedia.push(data2[h].direccion_archivo);
+				if (data[z]['codigo_Taller'] == data2[h]['codigo_Taller']) {
+					arrayMultimedia.push(data2[h].direccion_archivo_taller);
 					data[z]['fotos'] = arrayMultimedia;
 
 				}

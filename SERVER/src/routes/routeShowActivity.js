@@ -16,7 +16,7 @@ router.get('/personas', async (req, res) => {
 
 router.get('/talleres', async (req, res) => {
 	try {
-		const data = await pool.query('Select codigo_Taller, nombre_taller, modalidad, area, fecha_inicio FROM taller');
+		const data = await pool.query('Select codigo_Taller, nombre_taller, modalidad, area, fecha_inicio FROM taller WHERE CURDATE() > fecha_inicio_postulacion and CURDATE() < fecha_termino_postulacion');
 		const data2 = await pool.query('Select codigo_Taller, direccion_archivo_taller from direccion_multimedia_taller');
 
 		for (var z in data) {
@@ -54,29 +54,28 @@ router.get('/talleres', async (req, res) => {
 router.get('/detalles/:cod', async (req, res) => {
 	try {
 		const { cod } = req.params;
-		const data = await pool.query('select a.codigo_actividad, a.rut_responsable, a.cupos, a.direccion, a.nombre_actividad, a.estado_actividad, a.descripción, a.fecha_inicio, a.fecha_termino, a.modalidad, a.requisitos, a.area, a.edad_minima, p.nombres, p.apellidos, p.numero_contacto from actividades as a join persona as p on  a.codigo_actividad = ? and a.rut_responsable=p.rut', [cod]);
-		const data2 = await pool.query('select correo.correo from correo join actividades on correo.rut=actividades.rut_responsable and actividades.codigo_actividad=?', [cod]);
-		const data3 = await pool.query('Select codigo_actividad, direccion_archivo from direccion_multimedia where codigo_actividad=?', [cod]);
-		const data4 = await pool.query('select count(*) as personas_aceptadas from solicitud_deportiva where estado="aceptada" and codigo_actividad=?',[cod]);
-		const data5 = await pool.query('select horario from horarios where codigo_actividad=?',[cod]);
+		const data = await pool.query('select a.codigo_Taller, a.rut_responsable, a.cupos, a.direccion, a.nombre_taller, a.estado_taller, a.descripcion, a.fecha_inicio, a.fecha_termino, a.modalidad, a.requisitos, a.area, a.fecha_inicio_postulacion, a.fecha_termino_postulacion, a.edad_minima, p.nombres, p.apellidos, p.telefono_personal, p.telefono_contacto, p.correo from actividades as a join persona as p on  a.codigo_Taller = ? and a.rut_responsable=p.rut', [cod]);
+
+		const data3 = await pool.query('Select codigo_Taller, direccion_archivo_taller from direccion_multimedia_taller where codigo_Taller=?', [cod]);
+		const data4 = await pool.query('select count(*) as personas_aceptadas from solicitud_deportiva where estado="aceptada" and codigo_Taller=?',[cod]);
+		const data5 = await pool.query('select horario from horarios_taller where codigo_Taller=?',[cod]);
 
 		for (var z in data) {
 			var fecha_ini = data[z].fecha_inicio.toISOString().substring(0, 10);
 			var fecha_ter = data[z].fecha_termino.toISOString().substring(0, 10);
+			var fecha_ini_pos = data[z].fecha_inicio_postulacion.toISOString().substring(0, 10);
+			var fecha_ter_pos = data[z].fecha_termino_postulacion.toISOString().substring(0, 10);
 			if (data[z]) {
 				data[z]['fecha_inicio'] = fecha_ini;
 				data[z]['fecha_termino'] = fecha_ter;
+				data[z]['fecha_inicio_postulacion'] = fecha_ini_pos;
+				data[z]['fecha_termino_postulacion'] = fecha_ter_pos;
 			}
-		}
-
-		var arrayCorreos = [];
-		for (var x in data2) {
-			arrayCorreos.push(data2[x].correo);
 		}
 
 		var arrayMultimedia = [];
 		for (var x in data3) {
-			arrayMultimedia.push(data3[x].direccion_archivo);
+			arrayMultimedia.push(data3[x].direccion_archivo_taller);
 		}
 
 		var personas_aceptadas = 0;
@@ -98,7 +97,6 @@ router.get('/detalles/:cod', async (req, res) => {
 		}
 
 		data.map(function (row) {
-			row['correos'] = arrayCorreos;
 			row['fotos'] = arrayMultimedia;
 			row['personas_aceptadas'] = personas_aceptadas;
 			row['horarios'] = arrayHorarios;			

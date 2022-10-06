@@ -54,7 +54,7 @@ router.get('/talleres', async (req, res) => {
 router.get('/detalles/:cod', async (req, res) => {
 	try {
 		const { cod } = req.params;
-		const data = await pool.query('select a.codigo_Taller, a.rut_responsable, a.cupos, a.direccion, a.nombre_taller, a.estado_taller, a.descripcion, a.fecha_inicio, a.fecha_termino, a.modalidad, a.requisitos, a.area, a.fecha_inicio_postulacion, a.fecha_termino_postulacion, a.edad_minima, p.nombres, p.apellidos, p.telefono_personal, p.telefono_contacto, p.correo from actividades as a join persona as p on  a.codigo_Taller = ? and a.rut_responsable=p.rut', [cod]);
+		const data = await pool.query('select a.codigo_Taller, a.rut_responsable, a.cupos, a.direccion, a.nombre_taller, a.estado_taller, a.descripcion, a.fecha_inicio, a.fecha_termino, a.modalidad, a.requisitos, a.area, a.fecha_inicio_postulacion, a.fecha_termino_postulacion, a.edad_minima, p.nombres, p.apellidos, p.telefono_personal, p.telefono_contacto, p.correo from talleres as a join persona as p on a.codigo_Taller = ? and a.rut_responsable=p.rut', [cod]);
 
 		const data3 = await pool.query('Select codigo_Taller, direccion_archivo_taller from direccion_multimedia_taller where codigo_Taller=?', [cod]);
 		const data4 = await pool.query('select count(*) as personas_aceptadas from solicitud_deportiva where estado="aceptada" and codigo_Taller=?',[cod]);

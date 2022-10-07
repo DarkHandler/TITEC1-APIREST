@@ -145,7 +145,7 @@ router.post('/postulacion', async (req, res) => {
 
 		var rut_duplicado = await pool.query('select rut from persona where rut=?', datos.rut);
 		if(rut_duplicado.length > 0){
-			await pool.query('update persona set nombre = ?, apellidos = ?, telefono_personal = ?, telefono_contacto = ?, direccion = ?, sexo = ?, correo = ? where rut = ?', [insert_persona.nombres, insert_persona.apellidos, insert_persona.telefono_personal, insert_persona.telefono_contacto, insert_persona.direccion, insert_persona.sexo, insert_persona.correo , datos.rut]);
+			await pool.query('update persona set nombres = ?, apellidos = ?, telefono_personal = ?, telefono_contacto = ?, direccion = ?, sexo = ?, correo = ? where rut = ?', [insert_persona.nombres, insert_persona.apellidos, insert_persona.telefono_personal, insert_persona.telefono_contacto, insert_persona.direccion, insert_persona.sexo, insert_persona.correo , datos.rut]);
 		}else{
 			await pool.query('insert into persona(rut, nombres, apellidos, telefono_personal, telefono_contacto, fecha_nacimiento, talla, direccion, sexo, correo) values(?,?,?,?,?,?,?,?,?,?) ',[insert_persona.rut, insert_persona.nombres, insert_persona.apellidos, insert_persona.telefono_personal, insert_persona.telefono_contacto, insert_persona.fecha_nacimiento, insert_persona.talla, insert_persona.direccion, insert_persona.sexo, insert_persona.correo]);
 		}

@@ -5,6 +5,6 @@ module.exports = {
         host:'localhost',
         user:'bdgrupo1',
         password:'TITEC2-Grupo1',
-        database:'titec2bd'
+        database:'bdgrupo1_v2'
     }
 }

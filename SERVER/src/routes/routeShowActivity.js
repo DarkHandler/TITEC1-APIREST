@@ -125,7 +125,7 @@ router.post('/postulacion', async (req, res) => {
 
 	
 	try {
-		var rut_existente = await pool.query('select rut_postulante from solicitud_deportiva where rut_postulante=? AND codigo_actividad=?', [datos.rut, datos.codigo_actividad]);
+		var rut_existente = await pool.query('select rut_postulante from solicitud_deportiva where rut_postulante=? AND codigo_taller=?', [datos.rut, datos.codigo_Taller]);
 		if(rut_existente.length > 0){
 			resultado = {res:"rut postulado"};
 			return res.send(resultado);
@@ -134,48 +134,29 @@ router.post('/postulacion', async (req, res) => {
 		insert_persona.rut = datos.rut;
 		insert_persona.nombres = datos.nombres;
 		insert_persona.apellidos = datos.apellidos;
-		insert_persona.numero_contacto = datos.numero_contacto_final;
+		insert_persona.telefono_personal = datos.telefono_personal_final;
+		insert_persona.telefono_contacto = datos.telefono_contacto_final;
 		insert_persona.fecha_nacimiento = datos.fecha_nac;
-		insert_persona.prevision = datos.previsionChecked;
+		insert_persona.talla = 'NA'; //problemas con actualizar talla
+		insert_persona.direccion = datos.direccion;
+		insert_persona.sexo = datos.sexoChecked;
+		insert_persona.correo = datos.correo;
+		
 
 		var rut_duplicado = await pool.query('select rut from persona where rut=?', datos.rut);
 		if(rut_duplicado.length > 0){
-			await pool.query('update persona set ? where rut = ?', [insert_persona, datos.rut]);
+			await pool.query('update persona set nombre = ?, apellidos = ?, telefono_personal = ?, telefono_contacto = ?, direccion = ?, sexo = ?, correo = ? where rut = ?', [insert_persona.nombres, insert_persona.apellidos, insert_persona.telefono_personal, insert_persona.telefono_contacto, insert_persona.direccion, insert_persona.sexo, insert_persona.correo , datos.rut]);
 		}else{
-			await pool.query('insert into persona(rut, nombres, apellidos, numero_contacto, fecha_nacimiento, prevision) values(?,?,?,?,?,?) ',[datos.rut, datos.nombres, datos.apellidos, datos.numero_contacto_final, datos.fecha_nac, datos.previsionChecked]);
+			await pool.query('insert into persona(rut, nombres, apellidos, telefono_personal, telefono_contacto, fecha_nacimiento, talla, direccion, sexo, correo) values(?,?,?,?,?,?,?,?,?,?) ',[insert_persona.rut, insert_persona.nombres, insert_persona.apellidos, insert_persona.telefono_personal, insert_persona.telefono_contacto, insert_persona.fecha_nacimiento, insert_persona.talla, insert_persona.direccion, insert_persona.sexo, insert_persona.correo]);
 		}
 	
 	} catch (err) {
 		return res.status(505).send({errmsj:err.sqlMessage, errno: err.errno});
 	}
-	//aqui ingresamos correos
-	
-	try {
-		if(datos.arrayCorreos.length>0){
-		datos.arrayCorreos.map( async (correo) => {
-			var correo_duplicado = await pool.query('select correo from correo where rut=? and correo=?', [datos.rut, correo]);
-			if(correo_duplicado.length == 0){
-				await pool.query('insert into correo(rut, correo) values(?,?)',[datos.rut, correo]);
-			}
-	 	});
-		}
-	 } catch (error) {
-		return res.status(505).send({errmsj:err.sqlMessage, errno: err.errno});
-	}
+
 
 	try {
-		var direccion_duplicada = await pool.query('select * from direccion where rut = ?', [datos.rut]);
-		if(direccion_duplicada.length == 0){
-			await pool.query('insert into direccion(rut, localidad, numero, poblacion_o_villa, calle) values(?,?,?,?,?)',[datos.rut, datos.distritoChecked, parseInt(datos.numeroNuevoDepaCasa), datos.poblacion, datos.calle]);
-		}
-	} catch (error) {
-		console.log("error en insert direccion");
-		console.log(error);
-		resultado = {res:"en insert direccion"};
-	}
-
-	try {
-		await pool.query('insert into solicitud_deportiva(rut_postulante, codigo_actividad, fecha_inscripcion) values(?,?,?)',[datos.rut, datos.codigo_actividad, fecha_inscripcion]);
+		await pool.query('insert into solicitud_deportiva(rut_postulante, codigo_taller, fecha_inscripcion) values(?,?,?)',[datos.rut, datos.codigo_Taller, fecha_inscripcion]);
 	} catch (error) {
 		console.log("error en insert solcicitud_deportiva");
 		console.log(error);

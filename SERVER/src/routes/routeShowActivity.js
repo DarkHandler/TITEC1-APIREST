@@ -14,6 +14,46 @@ router.get('/personas', async (req, res) => {
 	}
 });
 
+router.get('/missolicitudes/:rut', async (req, res) => {
+        try {
+                const { rut } = req.params;
+                const data = await pool.query('Select * FROM solicitud_deportiva WHERE rut_postulante = ?', [rut]);
+		if(data.length == 0){
+			resultado = {res:"El RUT ingresado no ha postulado a ningun taller, ingrese otro RUT"};
+			return res.send(resultado);	
+		}
+                const data2 = await pool.query('Select codigo_Taller, direccion_archivo_taller from direccion_multimedia_taller');
+                for (var z in data) {
+                        const taller = await pool.query('Select nombre_taller, area, modalidad FROM taller WHERE codigo_Taller = ?', [data[z]['codigo_taller']]);
+                        data[z]['taller'] = taller;
+
+                        var fecha_ini = data[z].fecha_inscripcion.toISOString().substring(0, 10);
+                        //var fecha_ter = data[z].fecha_termino.toISOString().substring(0, 10);
+                        if (data[z]) {
+                                data[z]['fecha_inscripcion'] = fecha_ini;
+                                //data[z]['fecha_termino'] = fecha_ter;
+                        }
+                        arrayMultimedia = [];
+                        for (var h in data2) {
+                                if (data[z]['codigo_taller'] == data2[h]['codigo_Taller']) {
+                                        arrayMultimedia.push(data2[h].direccion_archivo_taller);
+                                        data[z]['fotos'] = arrayMultimedia;
+
+                                }
+
+                        }
+
+                        if (arrayMultimedia == '') {
+                                arrayMultimedia.push("SIN FOTOS");
+                                data[z]['fotos'] = arrayMultimedia;
+                        }
+                }
+                res.send(data);
+        } catch (ex) {
+                console.log(ex);
+        }
+});
+
 router.get('/talleres', async (req, res) => {
 	try {
 		const data = await pool.query('Select codigo_Taller, nombre_taller, modalidad, area, fecha_inicio FROM taller WHERE CURDATE() > fecha_inicio_postulacion and CURDATE() < fecha_termino_postulacion');

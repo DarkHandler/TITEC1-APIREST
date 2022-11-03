@@ -57,6 +57,7 @@ router.get('/missolicitudes/:rut', async (req, res) => {
 router.get('/talleres', async (req, res) => {
 	try {
 		const data = await pool.query('Select codigo_Taller, nombre_taller, modalidad, area, fecha_inicio FROM taller WHERE CURDATE() > fecha_inicio_postulacion and CURDATE() < fecha_termino_postulacion');
+		//const data = await pool.query('select codigo_Taller, nombre_taller, modalidad, area, fecha_inicio FROM taller WHERE codigo_Taller=10000');
 		const data2 = await pool.query('Select codigo_Taller, direccion_archivo_taller from direccion_multimedia_taller');
 
 		for (var z in data) {

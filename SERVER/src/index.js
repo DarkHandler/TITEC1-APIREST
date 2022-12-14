@@ -5,7 +5,7 @@ const pool = require('./database');
 const morgan = require('morgan');
 
 // Configuración
-app.set('port', process.env.PORT || 3000);
+app.set('port', process.env.PORT || 3002);
 app.use(express.json()); //Transfomar a formato JSON 
 app.use(morgan('dev')); //para mostrar un determinado tipo de mensaje en consola
 

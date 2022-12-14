@@ -24,7 +24,7 @@ DROP TABLE IF EXISTS `direccion_multimedia_taller`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `direccion_multimedia_taller` (
   `codigo_taller` int NOT NULL,
-  `direccion_archivo_taller` mediumtext,
+  `direccion_archivo_taller` mediumtext NOT NULL,
   PRIMARY KEY (`codigo_taller`),
   CONSTRAINT `direccion_multimedia_taller_ibfk_1` FOREIGN KEY (`codigo_taller`) REFERENCES `taller` (`codigo_Taller`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -36,7 +36,7 @@ CREATE TABLE `direccion_multimedia_taller` (
 
 LOCK TABLES `direccion_multimedia_taller` WRITE;
 /*!40000 ALTER TABLE `direccion_multimedia_taller` DISABLE KEYS */;
-INSERT INTO `direccion_multimedia_taller` VALUES (3,'futlbol.jpg'),(4,'basquetbol.jpg'),(5,'natacion.jpg');
+INSERT INTO `direccion_multimedia_taller` VALUES (3,'futlbol.jpg'),(4,'basquetbol.jpg'),(5,'natacion.jpg'),(7,'golf.jpg');
 /*!40000 ALTER TABLE `direccion_multimedia_taller` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -61,7 +61,7 @@ CREATE TABLE `horarios_taller` (
 
 LOCK TABLES `horarios_taller` WRITE;
 /*!40000 ALTER TABLE `horarios_taller` DISABLE KEYS */;
-INSERT INTO `horarios_taller` VALUES (3,'Lunes 9:00 - 11:00'),(3,'Martes 9:00 - 11:00'),(4,'Lunes 12:00 - 14:00'),(5,'Jueves 9:00 - 13:00');
+INSERT INTO `horarios_taller` VALUES (3,'Lunes 9:00 - 11:00'),(3,'Martes 9:00 - 11:00'),(4,'Lunes 12:00 - 14:00'),(5,'Jueves 9:00 - 13:00'),(7,'Lunes: 16:00 - 18:00 hrs');
 /*!40000 ALTER TABLE `horarios_taller` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -93,7 +93,7 @@ CREATE TABLE `persona` (
 
 LOCK TABLES `persona` WRITE;
 /*!40000 ALTER TABLE `persona` DISABLE KEYS */;
-INSERT INTO `persona` VALUES ('14.773.509-K','Mauricio Gonzalo','Olivares Soto','+56912445648','+56912345648','1999-01-03','NA','Marga Marga 319','Masculino','mauricio.olivares@hotmail.com'),('19.774.119-8','Maria','Juan','+56912345678','','1992-08-21','NA','Calle nueva #50','Prefiero no decirlo',''),('20.271.137-5','Mauricio','Eduardo','+56912345679','+56955555555','1995-08-21','NA','Calle falsa#80','Prefiero no decirlo',''),('4.198.356-6','Sebastian Rodrigo','Yañez Medina','+56912345648','+56912345648','1999-01-02','NA','Marga Marga 315','Masculino','sebastian.yanez@hotmail.com'),('8.773.084-0','Eugenio Alonso','Vivar Cortes','+56912345678','+56912345678','1999-01-01','NA','Marga Marga 312','Masculino','eugenio.vivar@hotmail.com');
+INSERT INTO `persona` VALUES ('8.773.084-0','Eugenio Alonso','Gonzales Figueroa','+56912345678','+56912345678','1999-01-01','NA','Marga Marga 312','Masculino','eugenio.gonzales@hotmail.com');
 /*!40000 ALTER TABLE `persona` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
@@ -130,13 +130,13 @@ CREATE TABLE `solicitud_deportiva` (
   `rut_postulante` varchar(12) NOT NULL,
   `codigo_taller` int NOT NULL,
   `fecha_inscripcion` date NOT NULL,
-  `estado_taller` enum('aceptada','rechazada','En proceso') DEFAULT 'En proceso',
+  `estado_solicitud` enum('aceptada','En proceso','En lista de espera') DEFAULT 'En proceso',
   PRIMARY KEY (`id_solicitud`),
   KEY `rut_postulante` (`rut_postulante`),
   KEY `codigo_taller` (`codigo_taller`),
   CONSTRAINT `solicitud_deportiva_ibfk_1` FOREIGN KEY (`rut_postulante`) REFERENCES `persona` (`rut`),
   CONSTRAINT `solicitud_deportiva_ibfk_2` FOREIGN KEY (`codigo_taller`) REFERENCES `taller` (`codigo_Taller`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -145,7 +145,6 @@ CREATE TABLE `solicitud_deportiva` (
 
 LOCK TABLES `solicitud_deportiva` WRITE;
 /*!40000 ALTER TABLE `solicitud_deportiva` DISABLE KEYS */;
-INSERT INTO `solicitud_deportiva` VALUES (1,'20.271.137-5',3,'2022-10-07','En proceso'),(2,'19.774.119-8',3,'2022-10-07','En proceso'),(3,'20.271.137-5',4,'2022-10-07','En proceso');
 /*!40000 ALTER TABLE `solicitud_deportiva` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -175,7 +174,7 @@ CREATE TABLE `taller` (
   PRIMARY KEY (`codigo_Taller`),
   KEY `rut_responsable` (`rut_responsable`),
   CONSTRAINT `taller_ibfk_1` FOREIGN KEY (`rut_responsable`) REFERENCES `persona` (`rut`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -184,7 +183,7 @@ CREATE TABLE `taller` (
 
 LOCK TABLES `taller` WRITE;
 /*!40000 ALTER TABLE `taller` DISABLE KEYS */;
-INSERT INTO `taller` VALUES (3,'8.773.084-0',25,'Quebrada diablo 2015','Futbol','Postulando','Taller vinculado a las edades mayores a 25 años o mas','2022-12-01','2023-01-01','presencial','Tener disposicion y zapatillas de football','Futbol','2022-10-01','2022-11-30',25),(4,'4.198.356-6',30,'Quebrada diablo 2015','Basquetbol','Postulando','Taller vinculado a las edades mayores a 25 años o mas','2022-12-01','2023-01-01','presencial','Tener disposicion y zapatillas de basquetbol','Basquetbol','2022-10-01','2022-11-30',25),(5,'14.773.509-K',20,'Quebrada diablo 2015','Natacion','Postulando','Taller vinculado a las edades mayores a 60 años o mas','2022-12-01','2023-01-01','presencial','Tener disposicion y Gorro de natacion','Natacionl','2022-10-01','2022-11-30',60);
+INSERT INTO `taller` VALUES (3,'8.773.084-0',35,'Quebrada diablo 2015','Futbol','Postulando','Taller vinculado a las edades mayores a 25 años o mas','2022-12-01','2023-01-01','presencial','Tener disposicion y zapatillas de football','futbol club','2022-10-01','2022-12-31',25),(4,'8.773.084-0',30,'Quebrada diablo 2015','Basquetbol','Postulando','Taller vinculado a las edades mayores a 25 años o mas','2022-12-01','2023-01-01','presencial','Tener disposicion y zapatillas de basquetbol','Basquetbol','2022-10-01','2022-12-31',25),(5,'8.773.084-0',20,'Quebrada diablo 2015','Natacion','Postulando','Taller vinculado a las edades mayores a 60 años o mas','2022-12-01','2023-01-01','presencial','Tener disposicion y Gorro de natacion','Natacionl','2022-10-01','2022-12-31',15),(7,'8.773.084-0',30,'Santo domingo #5123','Golf','Postulando','dia correcto para hacer golf!!!','2023-01-01','2023-01-31','presencial','Tener palo de golf solamente','Golf','2022-11-01','2022-12-31',35);
 /*!40000 ALTER TABLE `taller` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -197,4 +196,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-10-07 12:40:40
+-- Dump completed on 2022-12-14 11:31:38
